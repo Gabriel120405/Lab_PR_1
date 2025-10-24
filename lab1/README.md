@@ -1,87 +1,90 @@
-# Lab 1: Simple HTTP File Server (TCP sockets)
+# Lab 1: Simple HTTP File Server
 
-This project implements a minimal HTTP server using raw TCP sockets and a small HTTP client script.
+## Purpose
+Implementation of a simple HTTP server using TCP sockets, capable of serving static files (HTML, images, PDFs) and generating directory listings.
 
-## Features
-- Serves files from a directory passed as a command-line argument
-- Supports HTML, PNG, and PDF
-- Generates directory listings for folders (nested directories supported)
-- Safe path normalization to prevent directory traversal
-- Returns 404 for unknown types or missing files
-- SO_REUSEADDR enabled for quick restarts
-- Dockerfile and Docker Compose provided
-
-## Server Usage
-
-Local run (Windows PowerShell):
-
-```powershell
-python .\server.py .\www
+## Project Structure
+```
+lab1/
+  client.py
+  compose.yaml
+  Dockerfile
+  README.md
+  server.py
+  www/
+    index.html
+    europlasmet/
+      2025-10-24 14.47.46.jpg
+      2025-10-24 14.47.50.jpg
+    reports/
+      aproape_gata (1).pdf
+      numar.pdf
+      terminat.pdf
 ```
 
-Browse: http://localhost:8080/
+## Running Instructions
 
-## Client Usage
+### Local (Python)
+```zsh
+python3 server.py www
+```
+Access: http://localhost:8080
 
-Downloads and prints based on content-type.
-
-```powershell
-python .\client.py 127.0.0.1 8080 / subdir
-python .\client.py 127.0.0.1 8080 /index.html .
-python .\client.py 127.0.0.1 8080 /image.png .\downloads
-python .\client.py 127.0.0.1 8080 /docs/file.pdf .\downloads
+### Client
+```zsh
+python3 client.py 127.0.0.1 8080 /index.html .
+python3 client.py 127.0.0.1 8080 /europlasmet/2025-10-24\ 14.47.46.jpg .
+python3 client.py 127.0.0.1 8080 /reports/numar.pdf .
 ```
 
-- If HTML: prints body
-- If PNG/PDF: saves to target directory
-
-## Docker
-
+### Docker
 Build:
-```powershell
+```zsh
 docker build -t lab1-server .
 ```
 Run:
-```powershell
+```zsh
 docker run --rm -p 8080:8080 lab1-server
 ```
 
-## Docker Compose
-
-Compose file `compose.yaml` provided.
-
-```powershell
+### Docker Compose
+```zsh
 docker compose up --build
-# Stop
+# To stop:
 docker compose down
 ```
 
-Uncomment the volumes section in `compose.yaml` to mount local `www` for live editing.
+## Features
+- Serves HTML, PNG, JPG, PDF files
+- Automatic directory listing with links
+- Path normalization for security
+- Returns 404 for missing or unsupported files
+- Can be started quickly with Docker or Compose
 
-## Notes
-- Directory listings show folders and files with clickable links.
-- For a missing resource or unsupported type, the server returns HTTP 404.
-- The server handles one request at a time (sequential).
-
-## HTTP testing
-- Directory listing (prints HTML)
-```powershell
+## HTTP Testing Examples
+- Main directory listing:
+```zsh
 curl http://localhost:8080/
 ```
-
-- Subfolder listing
-```powershell
+- Subdirectory listing:
+```zsh
 curl http://localhost:8080/reports/
-curl http://localhost:8080/urus/
 ```
-
-- Show only headers
-```powershell
+- Headers only:
+```zsh
 curl -I http://localhost:8080/
 ```
-
-- Download a PDF and PNG
-```powershell
-curl http://localhost:8080/reports/week1.pdf -o .\week1.pdf
-curl http://localhost:8080/urus/urus1.png -o .\urus1.png
+- Download PDF/JPG:
+```zsh
+curl http://localhost:8080/reports/numar.pdf -o numar.pdf
+curl http://localhost:8080/europlasmet/2025-10-24%2014.47.46.jpg -o photo.jpg
 ```
+
+## Notes
+- For live editing, uncomment the `volumes` section in `compose.yaml`.
+- The server processes requests sequentially (one at a time).
+- Directory and file listings are generated automatically.
+
+## Author
+Moraru Gabriel
+24.10.2025
