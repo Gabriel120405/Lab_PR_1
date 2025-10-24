@@ -4,7 +4,7 @@ import os
 import mimetypes
 import urllib.parse
 
-ALLOWED_MIME = {"text/html", "image/png", "application/pdf"}
+ALLOWED_MIME = {"text/html", "image/png", "application/pdf", "image/jpeg"}
 
 def build_response(status_code: int, reason: str, headers: dict, body: bytes) -> bytes:
     lines = [f"HTTP/1.1 {status_code} {reason}"]
@@ -26,14 +26,14 @@ def generate_directory_listing(root_dir: str, rel_path: str) -> bytes:
     except OSError:
         return not_found_response()
 
-    # Custom ordering: index.html first, then any PDF, then any PNG, then the rest (alphabetically)
+    # Custom ordering: index.html first, then any PDF, then any PNG/JPG, then the rest (alphabetically)
     def sort_key(name: str):
         lname = name.lower()
         if lname == "index.html":
             pri = 0
         elif lname.endswith('.pdf'):
             pri = 1
-        elif lname.endswith('.png'):
+        elif lname.endswith('.png') or lname.endswith('.jpg') or lname.endswith('.jpeg'):
             pri = 2
         else:
             pri = 10
